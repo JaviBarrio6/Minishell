@@ -4,11 +4,20 @@
 
 int
 main(void) {
-	char buf[1024];
-	tline * line;
-	int i,j;
+	//Sección de Variables
+	
+	tline *line; //Variable de tipo line
+	char buffer[1024]; //Buffer
+	
+	//Fin de la Sección de Variables
 
-	printf("==> ");	
+	for (;;){ //Bucle Infinito
+		printf("Shell ==>");
+		fgets(buffer, 1024, stdin);
+		line = tokenize(buffer);
+	}
+	
+	/*printf("==> ");	
 	while (fgets(buf, 1024, stdin)) {
 		
 		line = tokenize(buf);
@@ -34,6 +43,6 @@ main(void) {
 			}
 		}
 		printf("==> ");	
-	}
+	}*/
 	return 0;
 }
