@@ -1,7 +1,7 @@
 
 //Librería suministrada por el profesorado
 
-//Estructura de Datos
+//Estructura de Datos  
 
 typedef struct {
 	char * filename;
