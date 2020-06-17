@@ -1,4 +1,8 @@
 
+//Librería suministrada por el profesorado
+
+//Estructura de Datos
+
 typedef struct {
 	char * filename;
 	int argc;
