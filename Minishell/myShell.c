@@ -1,5 +1,4 @@
-// Para compilar gcc -ansi -g -Wall -Wextra -static test.c libparser_64.a -o test -std=c99
-// o también gcc  test.c libparser_64.a -static -o test
+// Para compilar gcc  myShell.c libparser_64.a -static -o test
 
 #include <fcntl.h>
 #include <stdbool.h>
