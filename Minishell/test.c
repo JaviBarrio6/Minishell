@@ -17,7 +17,8 @@
 //Sección de Variables Globales
 	
 	tline * line; //Variable de tipo line
-	const char changeDirectory[] = "cd";
+	const char changeDirectory[] = "cd"; //Variable mandato cd
+	int *PIDS; //Variable para guardar los PIDs de los hijos
 	
 // Fin Sección de Variables Globales
 
@@ -78,13 +79,12 @@ executeLine(void){
 	//Sección de Variables Locales
 	
 	int i; //Variable contadora
-	int PID; //Variable para guardar el PID del hijo
 	int **p; //Variable para las pipes mediante memoria dinámica
 	int fd;
 	
 	//Fin de la Sección de Variables
 	
-	p= malloc(sizeof(int*)*line->ncommands-1); 
+	p = malloc(sizeof(int*)*line->ncommands-1); 
 	//Reservamos la memoria de un entero tantas veces como número de mandatos - 1
 	for (i = 0; i < (line->ncommands-1); i++){ //Bucle de recorrido del número de mandatos
 		p[i] = malloc(sizeof(int)*2); //Reservamos la memoria que ocupan dos enteros
@@ -96,16 +96,28 @@ executeLine(void){
 	
 	for (i = 0; i < line->ncommands; i++){ //Bucle de recorrido del número de mandatos
 		
-		PID = fork(); //Creamos un proceso hijo
+		PIDS = malloc(sizeof(int)*line->ncommands);
+		PIDS[i] = fork(); //Creamos un proceso hijo
 		
-		if (PID < 0){ //Error al crear proceso hijo
+		if (PIDS[i] < 0){ //Error al crear proceso hijo
 			
 			fprintf(stderr, "Error al crear proceso hijo"); //Notificación del error por la salida de error
 			exit(1); //A partir de ahora el valor de error 1, se utilizará para el error al crear un proceso hijo
 			
 		} 
 		
-		if (PID == 0){ //Proceso Hijo
+		if (PIDS[i] == 0){ //Proceso Hijo
+			
+			//Background
+			
+			if (!line->background){ //Si no tenemos background
+				
+				signal(SIGINT, SIG_DFL); //Habilitamos la señal SIGINT
+				signal(SIGQUIT, SIG_DFL); //Habilitamos la señal SIGQUIT
+				
+			}
+			
+			//Fin Background
 			
 			//Redirecciones
 			
@@ -195,9 +207,9 @@ executeLine(void){
 	}
 	
 	free(p); //Liberamos memoria
-			
+	
 	for (i = 0; i < line->ncommands; i++){ //Esperamos a los hijos
-		wait(NULL);
+		waitpid(PIDS[i], NULL, 0);
 	}
 	
 }
@@ -210,6 +222,9 @@ main(void) {
 	char* path;
 	
 	//Fin de la Sección de Variables
+	
+	signal(SIGINT, SIG_IGN); //Deshabilitamos la señal SIGINT
+	signal(SIGQUIT, SIG_IGN); //Deshabilitamos la señal SIGQUIT
 
 	for (;;){ //Bucle Infinito
 		if ((path = getcwd(NULL, 0)) == NULL){ //Obtenemos la ruta actual
